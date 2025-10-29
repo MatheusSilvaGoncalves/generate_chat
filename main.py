@@ -38,14 +38,13 @@ def answer_handling(question: Question, evaluate: Callable):
         print("Entrada inválida. Digite um número entre 1 e 4.")
 
 
-def iniciar_chat():
+def start_chat(n_questions: int, text_config: dict = None):
     print("=== Concurso Renda Extra Ton ===")
     url = "https://documentos.ton.com.br/rendaextra-todos-regulamentos.pdf"
     file_name = "regulamento.pdf"
-    n_questions = 10
     points = 0
     pdf_reader = PDFReader()
-    total_text = pdf_reader.get_list_of_sections(file_name, url)
+    total_text = pdf_reader.get_list_of_sections(file_name, url, text_config)
     generator = PtEnQuestionGenerator("Batata")
     for idx in range(n_questions):
         selected_text = random.choice(total_text)
@@ -60,4 +59,5 @@ def iniciar_chat():
 
 if __name__ == "__main__":
     random.seed(0)
-    iniciar_chat()
+    text_config_dict = {'max_section_length': 5, 'include_section_title': False}
+    start_chat(10, text_config_dict)

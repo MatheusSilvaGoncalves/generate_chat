@@ -32,7 +32,7 @@ class PDFReader:
         return text
 
     @staticmethod
-    def split_sections(text):
+    def split_sections(text, include_section_title = True):
         """
         Divide o texto em seções com base em títulos numerados.
         Retorna uma lista de dicionários: {"titulo": ..., "texto": ...}
@@ -59,13 +59,16 @@ class PDFReader:
                 end_text = len(text)
 
             if level > 0:
-                section = f"Texto referente a seção {current_section}: {item} {text[begin_text:end_text].strip()}"
+                if include_section_title:
+                    section = f"Texto referente a seção {current_section}: {item} {text[begin_text:end_text].strip()}"
+                else:
+                    section = f"{item} {text[begin_text:end_text].strip()}"
                 sections.append(section)
 
         return sections
 
     @staticmethod
-    def process_text(sections: list[str]) -> list[str]:
+    def process_text(sections: list[str], max_section_length: int = 500) -> list[str]:
         """
         Perform basic cleaning of the text.
         """
@@ -76,7 +79,8 @@ class PDFReader:
             clean_text = re.sub(r'\s+', ' ', text)
             # Remove spaces before punctuation
             clean_text = re.sub(r'\s+([.,;!?])', r'\1', clean_text)
-            new_sections.append(clean_text)
+            max_len = min(max_section_length, len(clean_text))
+            new_sections.append(clean_text[:max_len])
 
         return new_sections
 
@@ -139,8 +143,7 @@ class PDFReader:
                 })
         return blocks
 
-    def get_list_of_sections(self, file_name: str, url: str, num_pages: int = 13,
-                             mode: str = 'single'):
+    def get_list_of_sections(self, file_name: str, url: str, text_config: dict = None):
         """
         Get a list of sections of the text.
 
@@ -149,8 +152,10 @@ class PDFReader:
         :param num_pages: (int) with the last page to be read.
         """
 
-        text = self.read_pdf(file_name, url, num_pages=num_pages)
-        sections = self.split_sections(text)
-        processed_sections = self.process_text(sections)
+        if text_config is None:
+            text_config = {}
+        text = self.read_pdf(file_name, url, num_pages=text_config.get("num_pages", 13))
+        sections = self.split_sections(text, text_config.get("include_section_title", True))
+        processed_sections = self.process_text(sections, text_config.get("max_section_length", 500))
 
         return processed_sections
