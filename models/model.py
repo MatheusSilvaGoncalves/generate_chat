@@ -7,12 +7,13 @@ class Model:
 
     """
 
-    def __init__(self, model: ModelInterface, prompt_generator: Callable):
+    def __init__(self, model: ModelInterface, base_prompt: str, prompt_generator: Callable):
         """
 
         """
 
         self._model = model
+        self._base_prompt = base_prompt
         self._prompt_generator = prompt_generator
 
     def execute(self, content: list[str], kwargs: dict = None):
@@ -23,4 +24,4 @@ class Model:
 
         prompt = self._prompt_generator(content)
 
-        return self._model.execute(prompt, kwargs)
+        return self._model.execute(f"{self._base_prompt}\n{prompt}", kwargs)

@@ -3,20 +3,25 @@ class Prompts:
 
     """
 
-    def prompt_factory(self, option: str):
+    def prompt_factory(self, option: str, english: bool):
         """
 
         :param option:
         :return:
         """
 
-        if option == "correct_en":
+        if english:
+            option = f"{option}_en"
+        else:
+            option = f"{option}_pt"
+
+        if option == "correct_answer_en":
             return self.correct_answer_en
-        elif option == "wrong_en":
+        elif option == "wrong_answer_en":
             return self.wrong_answer_en
-        elif option == "make_question_en":
+        elif option == "question_en":
             return self.make_question_en
-        elif option == "summarize_en":
+        elif option == "processing_en":
             return self.summarize_en
         elif option == "translate_pt_to_en":
             return self.translate_pt_to_en
@@ -31,10 +36,7 @@ class Prompts:
 
         """
 
-        return f"""
-        Answer the following question based on the text. Avoid single-word answer.
-        Text: {content[1]}
-        Question: {content[0]}"""
+        return f"""Text: {content[1]} \n Question: {content[0]}"""
 
     @staticmethod
     def wrong_answer_en(content: list[str]) -> str:
@@ -42,11 +44,7 @@ class Prompts:
 
         """
 
-        return f"""Generate a plausible but incorrect answers for the following
-        question. Please, do not repeat the correct answer.
-        Question: {content[0]}
-        Correct answer: {content[1]}
-        Context: {content[2]}"""
+        return f"""Question: {content[0]} \n Correct answer: {content[1]} \n Context: {content[2]}"""
 
     @staticmethod
     def make_question_en(content: list[str]) -> str:
@@ -54,12 +52,7 @@ class Prompts:
 
         """
 
-        prompt = f"""Generate a clear and concise question from the text.
-        The question should be factual and directly answerable from the text.
-        Text: {content[0]}
-        Question:"""
-
-        return prompt
+        return f"""Text: {content[0]} \n Question:"""
 
     @staticmethod
     def summarize_en(content: list[str]) -> str:

@@ -2,7 +2,7 @@ from transformers import logging
 import random
 from typing import Callable
 from file_reader import PDFReader
-from models.pt_en_question_generator import PtEnQuestionGenerator
+from models.question_generator import QuestionGenerator
 from models.question import Question
 
 
@@ -38,19 +38,18 @@ def answer_handling(question: Question, evaluate: Callable):
         print("Entrada inválida. Digite um número entre 1 e 4.")
 
 
-def start_chat(n_questions: int, text_config: dict = None):
+def start_chat(n_questions: int, model_config: dict, text_config: dict = None, debug: bool = False):
     print("=== Concurso Renda Extra Ton ===")
     url = "https://documentos.ton.com.br/rendaextra-todos-regulamentos.pdf"
     file_name = "regulamento.pdf"
     points = 0
     pdf_reader = PDFReader()
     total_text = pdf_reader.get_list_of_sections(file_name, url, text_config)
-    generator = PtEnQuestionGenerator("Batata")
+    generator = QuestionGenerator(model_config)
     for idx in range(n_questions):
         selected_text = random.choice(total_text)
-        print(selected_text)
         total_text.remove(selected_text)
-        question = generator.generate(selected_text, n_alternatives=4)
+        question = generator.generate(selected_text, n_alternatives=4, debug=debug)
         question_handling(idx + 1, question)
         points += answer_handling(question, generator.evaluate_answer)
 
@@ -59,5 +58,42 @@ def start_chat(n_questions: int, text_config: dict = None):
 
 if __name__ == "__main__":
     random.seed(0)
-    text_config_dict = {'max_section_length': 5, 'include_section_title': False}
-    start_chat(10, text_config_dict)
+    model_config_dict = {"processing":
+                             [{"task": "summarization",
+                               "name": "sshleifer/distilbart-cnn-12-6"}],
+                         "question":
+                             [{"task": "text2text-generation",
+                               "name": "google/flan-t5-base",
+                               "prompt": "Generate a clear and concise question from the text. The question should be factual and directly answerable from the text."}],
+                         "correct_answer":
+                             [{"task": "text2text-generation",
+                               "name": "google/flan-t5-base",
+                               "prompt":
+                                   "Answer the following question based on the text. Avoid single-word answers."}],
+                         "wrong_answer":
+                             [{"task": "text2text-generation",
+                               "name": "google/flan-t5-base",
+                               "prompt": "Generate a plausible but incorrect answer for the following question. Please, do not repeat the correct answer.",
+                               "kwargs":
+                                   {"max_new_tokens": 100,
+                                    "temperature": 1,
+                                    "top_k": 50}},
+                              {"task": "text2text-generation",
+                               "name": "google/flan-t5-base",
+                               "prompt": "Generate a clearly incorrect answer for the following question. Please, do not repeat the correct answer.",
+                               "kwargs":
+                                   {"max_new_tokens": 25,
+                                    "temperature": 1.5,
+                                    "top_k": 5}},
+                              {"task": "text2text-generation",
+                               "name": "google/flan-t5-base",
+                               "prompt": "Modify the correct answer to be false. Please, do not repeat the correct answer.",
+                               "kwargs":
+                                   {"max_new_tokens": 200,
+                                    "temperature": 0.5,
+                                    "top_k": 10}}
+                              ]
+                         }
+    text_config_dict = {'max_section_length': 500, 'include_section_title': False}
+    view_debug = True
+    start_chat(10, model_config_dict, text_config_dict, view_debug)
