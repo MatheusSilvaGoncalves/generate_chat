@@ -9,13 +9,13 @@ from models.question import Question
 logging.set_verbosity_error()
 
 
-def question_handling(cont: int, question: Question, item: str):
+def question_handling(cont: int, question: Question):
     """
 
     :return:
     """
 
-    print(f"\nPergunta {cont}, referente ao item {item}: {question.question}")
+    print(f"\nPergunta {cont}, referente ao item {question.question}")
     for i, alt in enumerate(question.alternatives):
         print(f"{i + 1}) {alt[1]}")
 
@@ -47,12 +47,10 @@ def start_chat(n_questions: int, model_config: dict, text_config: dict = None, d
     points = 0
     pdf_reader = PDFReader()
     total_text = pdf_reader.get_list_of_sections(file_name, url, text_config)
-    generator = QuestionGenerator(model_config, pt_en_pt)
+    generator = QuestionGenerator(model_config, total_text, pt_en_pt)
     for idx in range(n_questions):
-        selected_text = random.choice(total_text)
-        total_text.remove(selected_text)
-        question = generator.generate(selected_text, n_alternatives=n_alternatives, debug=debug)
-        question_handling(idx + 1, question, selected_text.split(" ")[0].rstrip("."))
+        question = generator.generate(n_alternatives=n_alternatives, debug=debug)
+        question_handling(idx + 1, question)
         points += answer_handling(question, generator.evaluate_answer)
 
     print(f"Teste finalizado! Sua pontuação foi {points}/{n_questions}")
@@ -76,6 +74,7 @@ if __name__ == "__main__":
                              [{"task": "text2text-generation",
                                "name": "google/flan-t5-base",
                                "prompt": "Generate a plausible but incorrect answer for the following question. Please, do not repeat the correct answer.",
+                               "distractor": True,
                                "kwargs":
                                    {"max_new_tokens": 100,
                                     "temperature": 1,

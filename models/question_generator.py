@@ -12,12 +12,13 @@ class QuestionGenerator:
 
     """
 
-    def __init__(self, model: dict, pt_en_pt: bool = True):
+    def __init__(self, model: dict, text: list[str], pt_en_pt: bool = True):
         """
 
         """
 
         self._pt_en_pt = pt_en_pt
+        self._text = text
         if pt_en_pt:
             translation_pt_en = get_model("pt-en")
             translation_en_pt = get_model("en-pt")
@@ -37,14 +38,17 @@ class QuestionGenerator:
                     else:
                         employed_models[model_name] = TransformersModel(model_task, model_name)
                 item = {'model': Model(employed_models[model_name], base_prompt, prompt),
-                        'kwargs': step.get("kwargs", {})}
+                        'kwargs': step.get("kwargs", {}), "distractor": step.get("distractor", False)}
                 self._workflow[key].append(item)
 
-    def generate(self, content: str, n_alternatives: int, debug=True):
+    def generate(self, n_alternatives: int, debug=True):
         """
 
         """
 
+        content = random.choice(self._text)
+        section_number = content.split(" ")[0].rstrip(".")
+        self._text.remove(content)
         original_content = content
         if self._pt_en_pt:
             content = self._pt_en_translator.execute([content])
@@ -61,15 +65,26 @@ class QuestionGenerator:
             raise Exception(f"The number of provided models to generate wrong answers"
                             f"({len(self._workflow['wrong_answer'])}) is different of the desired ({n_alternatives - 1})")
         for item in self._workflow["wrong_answer"]:
-            wrong_answer_content = item['model'].execute([question_content, correct_answer_content, processed_content],
-                                                         item['kwargs'])
+            if item["distractor"]:
+                distractor = random.choice(self._text)
+                if self._pt_en_pt:
+                    distractor = self._pt_en_translator.execute([distractor])
+
+                wrong_answer_content = item['model'].execute(
+                    [question_content, correct_answer_content, distractor],
+                    item['kwargs'])
+            else:
+                wrong_answer_content = item['model'].execute([question_content, correct_answer_content, processed_content],
+                                                             item['kwargs'])
             answers.append(wrong_answer_content)
         if self._pt_en_pt:
-            question_content = self._en_pt_translator.execute([question_content])
+            question_content = f"{section_number}: {self._en_pt_translator.execute([question_content])}"
             new_answers = []
             for answer in answers:
                 new_answers.append(self._en_pt_translator.execute([answer]))
             answers = new_answers
+        else:
+            question_content = f"{section_number}: {question_content}"
 
         if debug:
             print("Original content: ", original_content)
