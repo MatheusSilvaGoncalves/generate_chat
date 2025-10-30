@@ -38,14 +38,14 @@ def answer_handling(question: Question, evaluate: Callable):
         print("Entrada inválida. Digite um número entre 1 e 4.")
 
 
-def start_chat(n_questions: int, model_config: dict, text_config: dict = None, debug: bool = False):
+def start_chat(n_questions: int, model_config: dict, text_config: dict = None, debug: bool = False, pt_en_pt: bool = True):
     print("=== Concurso Renda Extra Ton ===")
     url = "https://documentos.ton.com.br/rendaextra-todos-regulamentos.pdf"
     file_name = "regulamento.pdf"
     points = 0
     pdf_reader = PDFReader()
     total_text = pdf_reader.get_list_of_sections(file_name, url, text_config)
-    generator = QuestionGenerator(model_config)
+    generator = QuestionGenerator(model_config, pt_en_pt)
     for idx in range(n_questions):
         selected_text = random.choice(total_text)
         total_text.remove(selected_text)
@@ -96,4 +96,5 @@ if __name__ == "__main__":
                          }
     text_config_dict = {'max_section_length': 500, 'include_section_title': False}
     view_debug = True
-    start_chat(10, model_config_dict, text_config_dict, view_debug)
+    pt_en_pt = True
+    start_chat(10, model_config_dict, text_config_dict, view_debug, pt_en_pt)
