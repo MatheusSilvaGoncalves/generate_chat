@@ -25,17 +25,18 @@ def answer_handling(question: Question, evaluate: Callable):
     :return:
     """
 
-    selected = input("Escolha a alternativa correta (1-4): ")
-    try:
-        selected_int = int(selected) - 1
-        if not -1 < selected_int < 4:
-            raise ValueError
-        response, value = evaluate(question, selected_int)
-        print(response)
+    while True:
+        selected = input("Escolha a alternativa correta (1-4): ")
+        try:
+            selected_int = int(selected) - 1
+            if not -1 < selected_int < 4:
+                raise ValueError
+            response, value = evaluate(question, selected_int)
+            print(response)
 
-        return value
-    except:
-        print("Entrada inválida. Digite um número entre 1 e 4.")
+            return value
+        except:
+            print("Entrada inválida. Digite um número entre 1 e 4.")
 
 
 def start_chat(n_questions: int, model_config: dict, text_config: dict = None, debug: bool = False, pt_en_pt: bool = True):
