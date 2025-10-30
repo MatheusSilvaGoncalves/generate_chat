@@ -9,13 +9,13 @@ from models.question import Question
 logging.set_verbosity_error()
 
 
-def question_handling(cont: int, question: Question):
+def question_handling(cont: int, question: Question, item: str):
     """
 
     :return:
     """
 
-    print(f"\nPergunta {cont}: {question.question}")
+    print(f"\nPergunta {cont}, referente ao item {item}: {question.question}")
     for i, alt in enumerate(question.alternatives):
         print(f"{i + 1}) {alt[1]}")
 
@@ -51,7 +51,7 @@ def start_chat(n_questions: int, model_config: dict, text_config: dict = None, d
         selected_text = random.choice(total_text)
         total_text.remove(selected_text)
         question = generator.generate(selected_text, n_alternatives=4, debug=debug)
-        question_handling(idx + 1, question)
+        question_handling(idx + 1, question, selected_text.split(" ")[0].rstrip("."))
         points += answer_handling(question, generator.evaluate_answer)
 
     print(f"Teste finalizado! Sua pontuação foi {points}/{n_questions}")

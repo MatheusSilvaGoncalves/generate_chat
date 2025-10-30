@@ -101,4 +101,4 @@ class QuestionGenerator:
         if correct_idx == answer:
             return "✅ Correto!", 1
         else:
-            return f"❌ Errado! A resposta correta é: {correct_answer}", 0
+            return f"❌ Errado! A resposta correta é: {correct_idx + 1}) {correct_answer}", 0
