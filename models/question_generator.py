@@ -4,6 +4,7 @@ from models.base_models import get_model
 from models.prompts import Prompts
 from models.model import Model
 from models.base_models.transformers_model import TransformersModel
+from models.base_models.transformers_alternative import TransformersAlternative
 
 
 class QuestionGenerator:
@@ -31,7 +32,10 @@ class QuestionGenerator:
                 base_prompt = step.get("prompt", "")
                 prompt = Prompts().prompt_factory(key, self._pt_en_pt)
                 if model_name not in employed_models:
-                    employed_models[model_name] = TransformersModel(model_task, model_name)
+                    if "alternative" in step.keys():
+                        employed_models[model_name] = TransformersAlternative(model_task, model_name)
+                    else:
+                        employed_models[model_name] = TransformersModel(model_task, model_name)
                 item = {'model': Model(employed_models[model_name], base_prompt, prompt),
                         'kwargs': step.get("kwargs", {})}
                 self._workflow[key].append(item)
