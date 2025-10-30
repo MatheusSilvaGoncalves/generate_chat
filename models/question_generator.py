@@ -46,10 +46,10 @@ class QuestionGenerator:
             content = self._pt_en_translator.execute([content])
         processed_content = content
         for item in self._workflow["processing"]:
-            processed_content = item['model'].execute(processed_content, item['kwargs'])
+            processed_content = item['model'].execute([processed_content], item['kwargs'])
         question_content = processed_content
         for item in self._workflow["question"]:
-            question_content = item['model'].execute(question_content, item['kwargs'])
+            question_content = item['model'].execute([question_content], item['kwargs'])
         item = self._workflow["correct_answer"][0]
         correct_answer_content = item['model'].execute([question_content, processed_content], item['kwargs'])
         answers = [correct_answer_content]

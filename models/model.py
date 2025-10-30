@@ -24,4 +24,4 @@ class Model:
 
         prompt = self._prompt_generator(content)
 
-        return self._model.execute(f"{self._base_prompt}\n{prompt}", kwargs)
+        return self._model.execute(f"{self._base_prompt} {prompt}", kwargs)
