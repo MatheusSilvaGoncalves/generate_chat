@@ -1,5 +1,5 @@
 ## Descrição
-Chatbot baseado em interface conversacional e IA Generativa para geraão automática de questionários múltipla escolha
+Chatbot baseado em interface conversacional e IA Generativa para geração automática de questionários múltipla escolha
 baseados em leitura de arquivos pdf.
 
 O procedimento adotado nesta solução envolve dividir o problema em várias pequenas unidades, cada qual executada por um modelo.
@@ -55,9 +55,8 @@ O chat foi construído de modo a ser facilmente configurável, a seguir comenta-
     - "kwargs": (dict) com argumentos opcionais para o modelo (e.g., "max_new_tokens", "temperature").
 4. Configuração de extração de texto (text_config): (dict) com configurações opcionais para leitura e processamento de texto:
     - "num_pages": (int) com a última página a ser considerada.
-    - "max_section_length": (int) with the maximum length of the section.
-    - "include_section_title": (bool) indicating whether to include the main
-                                        section together or not.
+    - "max_section_length": (int) com o máximo comprimento permitido para a seção.
+    - "include_section_title": (bool) indicando se deve-se incluir o título principal da seção ou não.
 5. Debug (debug): (bool) indicando se o usuário deseja ver o resultado das etapas intermediárias de geração.
 6. Trabalhar em inglês (pt_en_pt): (bool) indicando se o usuário prefere que os modelos gerem o questionário em inglês e depois traduzam para português.
 7. Número de alternativas (n_alternatives): (int) com o número de alternativas a serem criadas.
