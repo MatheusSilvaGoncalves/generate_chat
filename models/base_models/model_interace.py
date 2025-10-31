@@ -1,22 +1,29 @@
 from abc import ABC
+from transformers import Pipeline
 
 
 class ModelInterface(ABC):
     """
-
+    Interface class for base models.
     """
 
-    def __init__(self, model):
+    def __init__(self, model: Pipeline):
         """
+        Initialization of the class.
 
+        :param model: (Pipeline) with the model pipeline.
         """
 
         self._model = model
 
     def execute(self, prompt: str, kwargs: dict = None) -> str:
         """
+        Method that execute a given task.
 
-        :return:
+        :param prompt: (str) with the prompt for the tas.
+        :param kwargs: (dict) with optional arguments (e.g., "max_new_tokens", "temperature").
+
+        :return: (str) with the model's response.
         """
 
         if kwargs is None:
