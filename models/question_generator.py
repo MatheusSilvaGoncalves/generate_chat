@@ -66,13 +66,19 @@ class QuestionGenerator:
                             f"({len(self._workflow['wrong_answer'])}) is different of the desired ({n_alternatives - 1})")
         for item in self._workflow["wrong_answer"]:
             if item["distractor"]:
-                distractor = random.choice(self._text)
-                if self._pt_en_pt:
-                    distractor = self._pt_en_translator.execute([distractor])
+                acceptable_answer = False
+                tries = 0
+                while not acceptable_answer:
+                    distractor = random.choice(self._text)
+                    if self._pt_en_pt:
+                        distractor = self._pt_en_translator.execute([distractor])
 
-                wrong_answer_content = item['model'].execute(
-                    [question_content, correct_answer_content, distractor],
-                    item['kwargs'])
+                    wrong_answer_content = item['model'].execute(
+                        [question_content, correct_answer_content, distractor],
+                        item['kwargs'])
+                    if wrong_answer_content not in answers or tries > 5:
+                        acceptable_answer = True
+                    tries += 1
             else:
                 wrong_answer_content = item['model'].execute([question_content, correct_answer_content, processed_content],
                                                              item['kwargs'])

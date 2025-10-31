@@ -63,36 +63,34 @@ if __name__ == "__main__":
                                "name": "sshleifer/distilbart-cnn-12-6"}],
                          "question":
                              [{"task": "text2text-generation",
-                               "name": "google/flan-t5-base",
-                               "prompt": "Generate a clear and concise question from the text. The question should be factual and directly answerable from the text."}],
+                               "name": "google/flan-t5-large",
+                               "prompt": "Generate a clear question based on the following text."}],
                          "correct_answer":
                              [{"task": "text2text-generation",
-                               "name": "google/flan-t5-base",
-                               "prompt":
-                                   "Answer the following question based on the text. Avoid single-word answers."}],
+                               "name": "google/flan-t5-large",
+                               "prompt": "Based on the text below, provide a concise, factually correct answer to the question. Do not invent information. The answer should be in one or two sentences."}],
                          "wrong_answer":
                              [{"task": "text2text-generation",
-                               "name": "google/flan-t5-base",
-                               "prompt": "Generate a plausible but incorrect answer for the following question. Please, do not repeat the correct answer.",
+                               "name": "google/flan-t5-large",
+                               "prompt": "Based on the text below, provide a concise answer to the question. The answer should be in one or two sentences.",
                                "distractor": True,
                                "kwargs":
                                    {"max_new_tokens": 100,
-                                    "temperature": 1,
-                                    "top_k": 50}},
+                                    "temperature": 0.8}},
                               {"task": "text2text-generation",
-                               "name": "google/flan-t5-base",
-                               "prompt": "Generate a clearly incorrect answer for the following question. Please, do not repeat the correct answer.",
+                               "name": "google/flan-t5-large",
+                               "prompt": "Based on the text below, provide a concise answer to the question. The answer should be in one or two sentences.",
+                               "distractor": True,
                                "kwargs":
-                                   {"max_new_tokens": 25,
-                                    "temperature": 1.5,
-                                    "top_k": 5}},
+                                   {"max_new_tokens": 100,
+                                    "temperature": 0.5}},
                               {"task": "text2text-generation",
-                               "name": "google/flan-t5-base",
-                               "prompt": "Modify the correct answer to be false. Please, do not repeat the correct answer.",
+                               "name": "google/flan-t5-large",
+                               "prompt": "Based on the text below, provide a concise answer to the question. The answer should be in one or two sentences.",
+                               "distractor": True,
                                "kwargs":
-                                   {"max_new_tokens": 200,
-                                    "temperature": 0.5,
-                                    "top_k": 10}}
+                                   {"max_new_tokens": 100,
+                                    "temperature": 0.9}}
                               ]
                          }
     text_config_dict = {'max_section_length': 500, 'include_section_title': False}
