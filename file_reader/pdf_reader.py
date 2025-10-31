@@ -60,7 +60,7 @@ class PDFReader:
 
             if level > 0:
                 if include_section_title:
-                    section = f"Texto referente a seção {current_section}: {item} {text[begin_text:end_text].strip()}"
+                    section = f"{item} Texto referente a seção {current_section}: {item} {text[begin_text:end_text].strip()}"
                 else:
                     section = f"{item} {text[begin_text:end_text].strip()}"
                 sections.append(section)
