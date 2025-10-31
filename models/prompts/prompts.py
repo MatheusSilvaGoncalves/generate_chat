@@ -1,13 +1,18 @@
+from typing import Callable
+
+
 class Prompts:
     """
-
+    Object that build the base prompts for each task in the workflow.
     """
 
-    def prompt_factory(self, option: str, english: bool):
+    def prompt_factory(self, option: str, english: bool) -> Callable:
         """
 
-        :param option:
-        :return:
+        :param option: (str) with the type of task.
+        :param english: (bool) indicating if the task is in english or portuguese.
+
+        :return: (Callable) with the method to generate the prompt
         """
 
         if english:
@@ -41,7 +46,10 @@ class Prompts:
     @staticmethod
     def correct_answer_en(content: list[str]) -> str:
         """
+        Prompt for generating a correct answer, in english.
+        :param content: (list[str]) with the question and the text to extract the answer.
 
+        :return: (str) with the prompt.
         """
 
         return f"""Text: {content[1]} \n Question: {content[0]}"""
@@ -50,7 +58,10 @@ class Prompts:
     @staticmethod
     def correct_answer_pt(content: list[str]) -> str:
         """
+        Prompt for generating a correct answer, in portuguese.
+        :param content: (list[str]) with the question and the text to extract the answer.
 
+        :return: (str) with the prompt.
         """
 
         return f"""Texto: {content[1]} \n Pergunta: {content[0]}"""
@@ -59,7 +70,10 @@ class Prompts:
     @staticmethod
     def wrong_answer_en(content: list[str]) -> str:
         """
+        Prompt for generating a wrong answer, in english.
+        :param content: (list[str]) with the question, the correct answer, and the text to extract the answer.
 
+        :return: (str) with the prompt.
         """
 
         return f"""Question: {content[0]} \n Correct answer: {content[1]} \n Context: {content[2]}"""
@@ -68,7 +82,10 @@ class Prompts:
     @staticmethod
     def wrong_answer_pt(content: list[str]) -> str:
         """
+        Prompt for generating a wrong answer, in portuguese.
+        :param content: (list[str]) with the question, the correct answer, and the text to extract the answer.
 
+        :return: (str) with the prompt.
         """
 
         return f"""Pergunta: {content[0]} \n Resposta correta: {content[1]} \n Contexto: {content[2]}"""
@@ -77,7 +94,10 @@ class Prompts:
     @staticmethod
     def make_question_en(content: list[str]) -> str:
         """
+        Prompt for generating a question, in english.
+        :param content: (list[str]) with the text to extract the question.
 
+        :return: (str) with the prompt.
         """
 
         return f"""Text: {content[0]} \n Question:"""
@@ -85,7 +105,10 @@ class Prompts:
     @staticmethod
     def make_question_pt(content: list[str]) -> str:
         """
+        Prompt for generating a question, in portuguese.
+        :param content: (list[str]) with the text to extract the question.
 
+        :return: (str) with the prompt.
         """
 
         return f"""Texto: {content[0]} \n Pergunta:"""
@@ -93,7 +116,10 @@ class Prompts:
     @staticmethod
     def summarize_en(content: list[str]) -> str:
         """
+        Prompt for summarizing a text, in english.
+        :param content: (list[str]) with the text to summarize.
 
+        :return: (str) with the prompt.
         """
 
         return content[0]
@@ -102,7 +128,10 @@ class Prompts:
     @staticmethod
     def summarize_pt(content: list[str]) -> str:
         """
+        Prompt for summarizing a text, in portuguese.
+        :param content: (list[str]) with the text to summarize.
 
+        :return: (str) with the prompt.
         """
 
         return content[0]
@@ -111,7 +140,10 @@ class Prompts:
     @staticmethod
     def translate_en_to_pt(content: list[str]) -> str:
         """
+        Prompt for translating a text, from english to portuguese.
+        :param content: (list[str]) with the text to be translated.
 
+        :return: (str) with the prompt.
         """
 
         return f"Translate English to Portuguese: {content[0]}."
@@ -119,7 +151,10 @@ class Prompts:
     @staticmethod
     def translate_pt_to_en(content: list[str]) -> str:
         """
+        Prompt for translating a text, from portuguese to english.
+        :param content: (list[str]) with the text to be translated.
 
+        :return: (str) with the prompt.
         """
 
         return f"Traduza do Português para o inglês: {content[0]}."
