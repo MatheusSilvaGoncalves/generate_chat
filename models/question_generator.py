@@ -1,10 +1,9 @@
 import random
 from models.question import Question
-from models.base_models import get_model
 from models.prompts import Prompts
 from models.model import Model
-from models.base_models.transformers_model import TransformersModel
-from models.base_models.transformers_alternative import TransformersAlternative
+from models.base_models import TransformersModel
+from models.base_models import TransformersAlternative
 
 
 class QuestionGenerator:
@@ -36,10 +35,12 @@ class QuestionGenerator:
         self._pt_en_pt = pt_en_pt
         self._text = text
         if pt_en_pt:
-            translation_pt_en = get_model("pt-en")
-            translation_en_pt = get_model("en-pt")
-            self._pt_en_translator = Model(translation_pt_en, "", Prompts().prompt_factory("translate_pt_to", True))
-            self._en_pt_translator = Model(translation_en_pt, "", Prompts().prompt_factory("translate_en_to", False))
+            pt_en_translator = TransformersAlternative('text2text-generation',
+                                                       "unicamp-dl/translation-pt-en-t5")
+            en_pt_translator = TransformersAlternative('text2text-generation',
+                                                       "unicamp-dl/translation-en-pt-t5")
+            self._pt_en_translator = Model(pt_en_translator, "", Prompts().prompt_factory("translate_pt_to", True))
+            self._en_pt_translator = Model(en_pt_translator, "", Prompts().prompt_factory("translate_en_to", False))
         employed_models = {}
         self._workflow = {"processing": [], "question": [], "correct_answer": [], "wrong_answer": []}
         for key in self._workflow.keys():
