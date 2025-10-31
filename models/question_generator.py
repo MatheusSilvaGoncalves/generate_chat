@@ -9,12 +9,28 @@ from models.base_models.transformers_alternative import TransformersAlternative
 
 class QuestionGenerator:
     """
-
+    Object that performs the complete workflow for generating a multiple choice question.
     """
 
     def __init__(self, model: dict, text: list[str], pt_en_pt: bool = True):
         """
+        Initializes the object
 
+        :param model: (dict) with the configuration of the workflow:
+                "processing"
+                "question", "correct_answer", "wrong_answer"
+                Each item may have the following items:
+                    "task": (str) with the task (e.g., "text2text-generation").
+                    "name": (str) with the name of the model (e.g., "google/flan-t5-large").
+                    "prompt": (str) with additional prompt.
+                    "alternative": (bool) indicating whether to use the
+                        TransformersModel or TransformersAlternative model.
+                    "distractor": (bool) optional parameter indicating whether to use a
+                        different section of text (useful for creating wrong answers)
+                    "kwargs": (dict) with optional arguments of the model
+                        (e.g., "max_new_tokens", "temperature").
+        :param text: (list[str]) with the sections of the text.
+        :param pt_en_pt: (bool) indicating whether to translate the workflow for english or not.
         """
 
         self._pt_en_pt = pt_en_pt
@@ -41,9 +57,15 @@ class QuestionGenerator:
                         'kwargs': step.get("kwargs", {}), "distractor": step.get("distractor", False)}
                 self._workflow[key].append(item)
 
-    def generate(self, n_alternatives: int, debug=True):
+    def generate(self, n_alternatives: int, debug: bool = True, max_tries: int = 5) -> Question:
         """
+        Method that generates a complete multiple choice Question object.
 
+        :param n_alternatives: (int) with the number of alternatives to be created.
+        :param debug: (bool) indicating whether to show the intermediate steps or not.
+        :param max_tries: (int) with maximum number of tries for generating different alternatives.
+
+        :return: (Question) with the multiple choice question generated.
         """
 
         content = random.choice(self._text)
@@ -76,7 +98,7 @@ class QuestionGenerator:
                     wrong_answer_content = item['model'].execute(
                         [question_content, correct_answer_content, distractor],
                         item['kwargs'])
-                    if wrong_answer_content not in answers or tries > 5:
+                    if wrong_answer_content not in answers or tries > max_tries:
                         acceptable_answer = True
                     tries += 1
             else:
@@ -110,10 +132,11 @@ class QuestionGenerator:
     @staticmethod
     def evaluate_answer(question: Question, answer: int) -> tuple[str, int]:
         """
+        Method that evaluates the answer for a given multiple choice question.
 
-        :param question:
-        :param answer:
-        :return:
+        :param question: (Question) with the multiple choice Question object.
+        :param answer: (int) with the selected alternative
+        :return: (tuple[str, int]) with the text assessing the answer's quality and the points made.
         """
 
         answers = question.alternatives
