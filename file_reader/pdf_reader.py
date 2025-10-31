@@ -9,13 +9,16 @@ class PDFReader:
     Read a pdf file and return a processed text.
     """
 
-    def read_pdf(self, file_name: str, url: str, num_pages: int = 13) -> str:
+    @staticmethod
+    def read_pdf(file_name: str, url: str, num_pages: int = 13) -> str:
         """
         Read the pdf file.
 
         :param file_name: (str) with the name of the pdf file.
         :param url: (str) with the url to download the pdf file, if it was not done yet.
         :param num_pages: (int) with the last page to be read.
+
+        :return: (str) with the content of the text.
         """
 
         if not os.path.exists(file_name):
@@ -32,10 +35,14 @@ class PDFReader:
         return text
 
     @staticmethod
-    def split_sections(text, include_section_title = True):
+    def split_sections(text: str, include_section_title: bool = True) -> list[str]:
         """
-        Divide o texto em seções com base em títulos numerados.
-        Retorna uma lista de dicionários: {"titulo": ..., "texto": ...}
+        Split the text in sections according to the identification number (e.g., 1.1, 2.3.1, etc...)
+
+        :param text: (str) with the text.
+        :param include_section_title: (bool) indicating whether to include the main section together or not.
+
+        :return: (list[str]) with the texts os each section.
         """
 
         sections = []
@@ -71,6 +78,11 @@ class PDFReader:
     def process_text(sections: list[str], max_section_length: int = 500) -> list[str]:
         """
         Perform basic cleaning of the text.
+
+        :param sections: (list[str]) with the sections to be processed.
+        :param max_section_length: (int) with the maximum length of the section.
+
+        :return: (list[str]) with the processed text of each section.
         """
 
         new_sections = []
@@ -84,72 +96,19 @@ class PDFReader:
 
         return new_sections
 
-    @staticmethod
-    def group_by_main_content(sections):
-        """
-        Group items according to a same content (e.g., section 1.1 and 1.2)
-        """
-
-        grouped = []
-        current_section = None
-
-        for s in sections:
-            if s["level"] == 0:
-                if current_section:
-                    grouped.append(current_section)
-                current_section = {
-                    "item": s["item"],
-                    "text": s["text"],
-                    "subitems": []
-                }
-            elif s["level"] == 1 and current_section:
-                current_section["subitems"].append(s)
-            elif s["level"] > 1 and current_section and current_section["subitems"]:
-                current_section["subitems"][-1]["text"] += "\n" + s["text"]
-
-        if current_section:
-            grouped.append(current_section)
-
-        return grouped
-
-    def generate_training_block(self, sections: list[dict], mode="grouped"):
-        """
-        Create blocks of text for training.
-
-        mode = 'single' independent sections.
-        mode = 'grouped' group together items according to main section content.
-        """
-
-        blocks = []
-        if mode == "single":
-            current_title = ""
-            for s in sections:
-                if s['level'] > 0:
-                    blocks.append({
-                        "context": current_title,
-                        "text": s["item"] + s["text"],
-                    })
-                else:
-                    current_title = s["item"]
-        elif mode == "grouped":
-            grouped = self.group_by_main_content(sections)
-            for g in grouped:
-                whole_text = g["text"]
-                for sub in g["subitems"]:
-                    whole_text += f"\n{sub['item']}\n{sub['text']}"
-                blocks.append({
-                    "context": g["item"],
-                    "text": whole_text,
-                })
-        return blocks
-
     def get_list_of_sections(self, file_name: str, url: str, text_config: dict = None):
         """
-        Get a list of sections of the text.
+        Get a list with the processed sections of the text for training.
 
         :param file_name: (str) with the name of the pdf file.
         :param url: (str) with the url to download the pdf file, if it was not done yet.
-        :param num_pages: (int) with the last page to be read.
+        :param text_config: (dict) with optional configuration for extract the data.
+        The possible options are: "num_pages": (int) with the last page to be read.
+                                  "include_section_title": (int) with the maximum length of the section.
+                                  "max_section_length": (bool) indicating whether to include the main
+                                        section together or not.
+
+        :return: (list[str]) with the processed text of each section.
         """
 
         if text_config is None:
