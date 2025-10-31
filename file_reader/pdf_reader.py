@@ -104,8 +104,8 @@ class PDFReader:
         :param url: (str) with the url to download the pdf file, if it was not done yet.
         :param text_config: (dict) with optional configuration for extract the data.
         The possible options are: "num_pages": (int) with the last page to be read.
-                                  "include_section_title": (int) with the maximum length of the section.
-                                  "max_section_length": (bool) indicating whether to include the main
+                                  "max_section_length": (int) with the maximum length of the section.
+                                  "include_section_title": (bool) indicating whether to include the main
                                         section together or not.
 
         :return: (list[str]) with the processed text of each section.
